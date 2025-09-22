@@ -101,13 +101,7 @@ jobs:
     - name: Create backend.tf file
       working-directory: ${{ inputs.deployDirectory }}
       if: steps.check-backend.outputs.backend_exists == 'false'
-      run: |
-        if [[ "${{ inputs.environmentName }}" == "prelive" || "${{ inputs.environmentName }}" == "live" ]]; then
-          BUCKET_SUFFIX="-prod"
-        else
-          BUCKET_SUFFIX="-dev"
-        fi
-        
+      run: |        
         cat << EOF > backend.tf
         terraform {
           backend "s3" {

@@ -32,5 +32,5 @@ jobs:
       environmentName: ${{ inputs.environmentName || 'test' }}
       projectName: ${{ github.event.repository.name }}
       version: ${{ github.sha }}
-      destroyTerraform: ${{ inputs.destroyTerraform }}
+      destroyTerraform: ${{ inputs.destroyTerraform || false }}
     secrets: inherit
