@@ -72,7 +72,7 @@ module "subnets_b" {
   name_prefix         = local.name_prefix
   tags                = local.common_tags
   vpc_id              = aws_vpc.main.id
-  availability_zone   = data.aws_availability_zones.available.names[0]
+  availability_zone   = data.aws_availability_zones.available.names[1]
   igw_id              = aws_internet_gateway.igw.id
   public_subnet_cidr  = local.subnets.subnet_b.public_cidr
   private_subnet_cidr = local.subnets.subnet_b.private_cidr
