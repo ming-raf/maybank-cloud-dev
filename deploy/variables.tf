@@ -1,7 +1,7 @@
 variable "AWS_REGION" {
   description = "The AWS region to deploy resources in"
   type        = string
-  default = "ap-southeast-2"
+  default = "ap-southeast-1"
 }
 
 variable "ENVIRONMENT_NAME" {
