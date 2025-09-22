@@ -1,0 +1,36 @@
+name: Terraform Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      accountId:
+        description: "AWS Account ID to assume role into"
+        required: false
+        type: string
+        default: "879381243152"
+      environmentName:
+        description: "Environment name to deploy to"
+        required: false
+        type: string
+        default: "test"
+      destroyTerraform:
+        description: "Only do terraform destroy"
+        type: boolean
+        default: false
+        required: false
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  deploy-tf:
+    uses: ./.github/workflows/deploy-tf.yaml
+    with:
+      accountId: ${{ inputs.accountId || '879381243152' }}
+      environmentName: ${{ inputs.environmentName || 'test' }}
+      projectName: ${{ github.event.repository.name }}
+      version: ${{ github.sha }}
+      destroyTerraform: ${{ inputs.destroyTerraform }}
+    secrets: inherit
