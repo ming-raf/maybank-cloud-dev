@@ -35,8 +35,8 @@ resource "aws_db_subnet_group" "rds" {
 
 resource "aws_db_parameter_group" "mariadb" {
 	name   = "${local.name_prefix}-mariadb-params"
-	family = "mariadb10.11"
-	description = "Parameter group for MariaDB 10.11"
+	family = "mariadb11.8"
+	description = "Parameter group for MariaDB 11.8"
 
 	parameter {
 		name  = "character_set_server"
@@ -76,8 +76,8 @@ resource "aws_db_instance" "mariadb" {
 	max_allocated_storage      = 50
 	storage_type               = "gp3"
 	engine                     = "mariadb"
-	engine_version             = "10.11.6"
-	instance_class             = "db.t3.micro"
+	engine_version             = "11.8.3"
+	instance_class             = "db.m5.large"
 	db_name                    = local.db_name
 	username                   = local.db_username
 	password                   = random_password.db_master.result
@@ -102,7 +102,7 @@ resource "aws_db_instance" "mariadb" {
 resource "aws_db_instance" "mariadb_replica" {
 	identifier           = "${local.name_prefix}-mariadb-replica-1"
 	replicate_source_db  = aws_db_instance.mariadb.id
-	instance_class       = "db.t3.micro"
+	instance_class       = "db.m5.large"
 	availability_zone    = data.aws_availability_zones.available.names[1]
 	publicly_accessible  = false
 	apply_immediately    = true
