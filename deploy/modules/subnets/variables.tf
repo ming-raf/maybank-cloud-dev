@@ -3,12 +3,6 @@ variable "name_prefix" {
   type        = string
 }
 
-variable "tags" {
-  description = "Common tags to apply"
-  type        = map(string)
-  default     = {}
-}
-
 variable "vpc_id" {
   description = "ID of the VPC to place subnets in"
   type        = string

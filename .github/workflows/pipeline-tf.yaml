@@ -29,6 +29,18 @@ permissions:
   contents: read
 
 jobs:
+  deploy-edge-tf:
+    uses: ./.github/workflows/deploy-tf.yaml
+    with:
+      accountId: ${{ inputs.accountId || '879381243152' }}
+      environmentName: ${{ inputs.environmentName || 'test' }}
+      projectName: ${{ github.event.repository.name }}
+      region: "us-east-1"
+      deployDirectory: "deploy/modules/edge"
+      version: ${{ github.sha }}
+      destroyTerraform: ${{ inputs.destroyTerraform || false }}
+    secrets: inherit
+
   deploy-tf:
     uses: ./.github/workflows/deploy-tf.yaml
     with:
@@ -38,3 +50,4 @@ jobs:
       version: ${{ github.sha }}
       destroyTerraform: ${{ inputs.destroyTerraform || false }}
     secrets: inherit
+    needs: deploy-edge-tf
