@@ -19,11 +19,6 @@ variable "VERSION" {
   type        = string
 }
 
-variable "nlb_domain_name" {
-  description = "Custom domain name to use for the NLB (e.g., api.example.com)"
-  type        = string
-}
-
 variable "route53_zone_id" {
   description = "Route53 hosted zone ID that contains the domain"
   type        = string

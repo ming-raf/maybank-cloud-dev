@@ -1,7 +1,6 @@
 
 # Load Balancer
 locals {
-  name_prefix = "${var.PROJECT_NAME}-${var.ENVIRONMENT_NAME}"
   domain_name = "maybank.${var.ENVIRONMENT_NAME}.example.com"
 }
 
