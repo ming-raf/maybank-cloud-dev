@@ -34,7 +34,7 @@ jobs:
     with:
       accountId: ${{ inputs.accountId || '879381243152' }}
       environmentName: ${{ inputs.environmentName || 'test' }}
-      projectName: ${{ github.event.repository.name }}
+      projectName: "maybank-cloud-dev-edge"
       region: "us-east-1"
       deployDirectory: "deploy/modules/edge"
       version: ${{ github.sha }}
@@ -46,7 +46,7 @@ jobs:
     with:
       accountId: ${{ inputs.accountId || '879381243152' }}
       environmentName: ${{ inputs.environmentName || 'test' }}
-      projectName: ${{ github.event.repository.name }}
+      projectName: "maybank-cloud-dev"
       version: ${{ github.sha }}
       destroyTerraform: ${{ inputs.destroyTerraform || false }}
     secrets: inherit

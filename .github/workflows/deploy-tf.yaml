@@ -107,7 +107,7 @@ jobs:
           backend "s3" {
             bucket = "terraform-rafiqi-personal"
             key    = "${{ inputs.environmentName }}/.terraform/${{ inputs.projectName }}.tfstate"
-            region = "${{ inputs.region }}"
+            region = "ap-southeast-1"
           }
         }
         EOF
