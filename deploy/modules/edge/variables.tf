@@ -19,6 +19,12 @@ variable "VERSION" {
   type        = string
 }
 
+variable "ORIGIN_REGION" {
+  description = "AWS region of the origin resources (core stack), e.g. where S3 bucket and NLB are created"
+  type        = string
+  default     = "ap-southeast-1"
+}
+
 variable "CORE_STATE_BUCKET" {
   description = "S3 bucket that stores the core stack's Terraform state"
   type        = string

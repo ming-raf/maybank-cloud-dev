@@ -8,7 +8,12 @@ terraform {
 }
 
 provider "aws" {
-  region = var.AWS_REGION
+	region = var.AWS_REGION
+}
+
+provider "aws" {
+	alias  = "origin"
+	region = var.ORIGIN_REGION
 }
 
 locals {
@@ -126,6 +131,7 @@ data "aws_iam_policy_document" "allow_cf_access" {
 }
 
 resource "aws_s3_bucket_policy" "allow_cf" {
-	bucket = data.terraform_remote_state.core.outputs.s3_bucket_name
-	policy = data.aws_iam_policy_document.allow_cf_access.json
+	provider = aws.origin
+	bucket   = data.terraform_remote_state.core.outputs.s3_bucket_name
+	policy   = data.aws_iam_policy_document.allow_cf_access.json
 }
