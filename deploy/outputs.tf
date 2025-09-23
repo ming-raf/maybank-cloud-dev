@@ -8,6 +8,21 @@ output "vpc_cidr" {
   value       = aws_vpc.main.cidr_block
 }
 
+output "rds_endpoint" {
+  description = "RDS instance endpoint"
+  value       = aws_db_instance.mariadb.address
+}
+
+output "rds_replica_endpoint" {
+  description = "RDS read replica endpoint"
+  value       = aws_db_instance.mariadb_replica.address
+}
+
+output "rds_secret_arn" {
+  description = "Secrets Manager ARN containing RDS master credentials"
+  value       = aws_secretsmanager_secret.db_master.arn
+}
+
 output "s3_bucket_name" {
   description = "Name of the site S3 bucket"
   value       = aws_s3_bucket.site.bucket

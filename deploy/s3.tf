@@ -4,7 +4,6 @@ locals {
 
 data "aws_caller_identity" "current" {}
 
-# S3 Bucket
 resource "aws_s3_bucket" "site" {
   bucket        = local.bucket_name
   force_destroy = true
