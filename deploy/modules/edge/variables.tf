@@ -18,3 +18,21 @@ variable "VERSION" {
   description = "Version of the deployment"
   type        = string
 }
+
+variable "CORE_STATE_BUCKET" {
+  description = "S3 bucket that stores the core stack's Terraform state"
+  type        = string
+  default     = "terraform-rafiqi-personal"
+}
+
+variable "CORE_STATE_REGION" {
+  description = "Region of the S3 bucket that stores the core stack's Terraform state"
+  type        = string
+  default     = "ap-southeast-1"
+}
+
+variable "CORE_STATE_PROJECT_NAME" {
+  description = "Project name used in the core stack's state key"
+  type        = string
+  default     = "maybank-cloud-dev"
+}

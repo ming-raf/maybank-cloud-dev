@@ -50,5 +50,7 @@ jobs:
       deployDirectory: "deploy/modules/edge"
       version: ${{ github.sha }}
       destroyTerraform: ${{ inputs.destroyTerraform || false }}
+      build-args: |
+        CORE_STATE_PROJECT_NAME=maybank-cloud-dev
     secrets: inherit
     needs: [deploy-tf]

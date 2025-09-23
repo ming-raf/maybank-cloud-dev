@@ -37,8 +37,6 @@ resource "aws_lb_listener" "nlb_https" {
   }
 }
 
-data "aws_elb_hosted_zone_id" "current" {}
-
 resource "aws_route53_record" "nlb_alias" {
   zone_id = aws_route53_zone.edge.zone_id
   name    = "nlb.${local.domain_name}"

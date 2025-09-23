@@ -30,6 +30,10 @@ on:
         type: boolean
         default: false
         required: false
+      build-args:
+        description: "List of build-time variables"
+        type: string
+        required: false
 
 jobs:
   terraform-deploy:
@@ -45,6 +49,8 @@ jobs:
       VERSION: ${{ inputs.version }}
       SHA: ${{ github.sha }}
       ACCOUNT_ID: ${{ inputs.accountId }}
+      CORE_STATE_BUCKET: "terraform-rafiqi-personal"
+      CORE_STATE_REGION: "ap-southeast-1"
     environment: ${{ inputs.environmentName }}
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -61,6 +67,13 @@ jobs:
       uses: opentofu/setup-opentofu@592200bd4b9bbf4772ace78f887668b1aee8f716 # v1.0.5
       with:
         tofu_version: latest
+    - id: set-env
+      run: |
+        echo "${{ inputs.build-args }}" > build_args.txt
+        while IFS= read -r line
+        do
+          echo "$line" >> $GITHUB_ENV
+        done < build_args.txt
     - name: Convert Environment Variables to TF_VAR format
       run: |
         echo "Converting environment variables to TF_VAR format..."
@@ -105,9 +118,9 @@ jobs:
         cat << EOF > backend.tf
         terraform {
           backend "s3" {
-            bucket = "terraform-rafiqi-personal"
+            bucket = "${{ env.CORE_STATE_BUCKET }}"
             key    = "${{ inputs.environmentName }}/.terraform/${{ inputs.projectName }}.tfstate"
-            region = "ap-southeast-1"
+            region = "${{ env.CORE_STATE_REGION }}"
           }
         }
         EOF

@@ -13,12 +13,22 @@ provider "aws" {
 
 locals {
 	cloudfront_name = "${var.PROJECT_NAME}-${var.ENVIRONMENT_NAME}-cdn"
-	bucket_name     = "maybank.rafiqi.example.com"
+}
+
+data "aws_caller_identity" "current" {}
+
+data "terraform_remote_state" "core" {
+	backend = "s3"
+	config = {
+		bucket = var.CORE_STATE_BUCKET
+		key    = "${var.ENVIRONMENT_NAME}/.terraform/${var.CORE_STATE_PROJECT_NAME}.tfstate"
+		region = var.CORE_STATE_REGION
+	}
 }
 
 resource "aws_cloudfront_origin_access_control" "oac" {
 	name                              = "${local.cloudfront_name}-oac"
-	description                       = "OAC for ${aws_s3_bucket.site.bucket}"
+	description                       = "OAC for ${data.terraform_remote_state.core.outputs.s3_bucket_name}"
 	origin_access_control_origin_type = "s3"
 	signing_behavior                  = "always"
 	signing_protocol                  = "sigv4"
@@ -30,8 +40,8 @@ resource "aws_cloudfront_distribution" "cdn" {
 	default_root_object = "index.html"
 
 	origin {
-		domain_name              = aws_s3_bucket.site.bucket_regional_domain_name
-		origin_id                = "s3-origin-${aws_s3_bucket.site.id}"
+		domain_name              = data.terraform_remote_state.core.outputs.s3_bucket_regional_domain
+		origin_id                = "s3-origin-${data.terraform_remote_state.core.outputs.s3_bucket_name}"
 		origin_access_control_id = aws_cloudfront_origin_access_control.oac.id
 
 		s3_origin_config {
@@ -40,19 +50,19 @@ resource "aws_cloudfront_distribution" "cdn" {
 	}
 
 	origin {
-		domain_name = aws_lb.nlb.dns_name
+		domain_name = data.terraform_remote_state.core.outputs.nlb_dns_name
 		origin_id   = "nlb-origin"
 
 		custom_origin_config {
 			http_port              = 80
 			https_port             = 443
-			origin_protocol_policy = "https-only"
+			origin_protocol_policy = "http-only"
 			origin_ssl_protocols   = ["TLSv1.2"]
 		}
 	}
 
 	default_cache_behavior {
-		target_origin_id       = "s3-origin-${aws_s3_bucket.site.id}"
+		target_origin_id       = "s3-origin-${data.terraform_remote_state.core.outputs.s3_bucket_name}"
 		viewer_protocol_policy = "redirect-to-https"
 		allowed_methods        = ["GET", "HEAD"]
 		cached_methods         = ["GET", "HEAD"]
@@ -89,4 +99,33 @@ resource "aws_cloudfront_distribution" "cdn" {
 	viewer_certificate {
 		cloudfront_default_certificate = true
 	}
+}
+
+data "aws_iam_policy_document" "allow_cf_access" {
+	statement {
+		sid     = "AllowCloudFrontServicePrincipalRead"
+		effect  = "Allow"
+		actions = ["s3:GetObject"]
+
+		resources = [
+			"${data.terraform_remote_state.core.outputs.s3_bucket_arn}",
+			"${data.terraform_remote_state.core.outputs.s3_bucket_arn}/*"
+		]
+
+		principals {
+			type        = "Service"
+			identifiers = ["cloudfront.amazonaws.com"]
+		}
+
+		condition {
+			test     = "StringEquals"
+			variable = "AWS:SourceArn"
+			values   = ["arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${aws_cloudfront_distribution.cdn.id}"]
+		}
+	}
+}
+
+resource "aws_s3_bucket_policy" "allow_cf" {
+	bucket = data.terraform_remote_state.core.outputs.s3_bucket_name
+	policy = data.aws_iam_policy_document.allow_cf_access.json
 }
