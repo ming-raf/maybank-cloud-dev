@@ -51,7 +51,6 @@ resource "aws_acm_certificate" "nlb" {
   }
 }
 
-# Create DNS validation records in Route 53
 resource "aws_route53_record" "nlb_cert_validation" {
   for_each = {
     for dvo in aws_acm_certificate.nlb.domain_validation_options : dvo.domain_name => {

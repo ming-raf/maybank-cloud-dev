@@ -29,6 +29,17 @@ permissions:
   contents: read
 
 jobs:
+
+  deploy-tf:
+    uses: ./.github/workflows/deploy-tf.yaml
+    with:
+      accountId: ${{ inputs.accountId || '879381243152' }}
+      environmentName: ${{ inputs.environmentName || 'test' }}
+      projectName: "maybank-cloud-dev"
+      version: ${{ github.sha }}
+      destroyTerraform: ${{ inputs.destroyTerraform || false }}
+    secrets: inherit
+
   deploy-edge-tf:
     uses: ./.github/workflows/deploy-tf.yaml
     with:
@@ -40,14 +51,4 @@ jobs:
       version: ${{ github.sha }}
       destroyTerraform: ${{ inputs.destroyTerraform || false }}
     secrets: inherit
-
-  deploy-tf:
-    uses: ./.github/workflows/deploy-tf.yaml
-    with:
-      accountId: ${{ inputs.accountId || '879381243152' }}
-      environmentName: ${{ inputs.environmentName || 'test' }}
-      projectName: "maybank-cloud-dev"
-      version: ${{ github.sha }}
-      destroyTerraform: ${{ inputs.destroyTerraform || false }}
-    secrets: inherit
-    needs: deploy-edge-tf
+    needs: [deploy-tf]
