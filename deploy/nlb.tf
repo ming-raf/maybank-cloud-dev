@@ -70,7 +70,7 @@ resource "aws_route53_record" "nlb_cert_validation" {
 
 resource "aws_acm_certificate_validation" "nlb" {
   certificate_arn         = aws_acm_certificate.nlb.arn
-  validation_record_fqdns = [for r in aws_route53_record.nlb_cert_validation : r.value.fqdn]
+  validation_record_fqdns = [for r in aws_route53_record.nlb_cert_validation : r.fqdn]
 }
 
 data "aws_elb_hosted_zone_id" "current" {}
