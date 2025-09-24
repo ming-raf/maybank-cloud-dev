@@ -85,8 +85,7 @@ resource "aws_db_instance" "mariadb" {
 	multi_az                   = false
 	publicly_accessible        = false
 	deletion_protection        = false
-	skip_final_snapshot        = false
-	final_snapshot_identifier  = "${local.name_prefix}-mariadb-final"
+	skip_final_snapshot        = true
 	backup_retention_period    = 7
 	auto_minor_version_upgrade = true
 	apply_immediately          = true
