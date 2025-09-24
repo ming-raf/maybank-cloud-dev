@@ -1,7 +1,7 @@
 resource "aws_security_group" "efs" {
   name        = "${local.name_prefix}-efs-sg"
   description = "NFS access for EFS"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = data.terraform_remote_state.core.outputs.vpc_id
 
   ingress {
     description = "NFS"
@@ -35,12 +35,12 @@ resource "aws_efs_file_system" "this" {
 
 resource "aws_efs_mount_target" "a" {
   file_system_id  = aws_efs_file_system.this.id
-  subnet_id       = module.subnets_a.private_subnet_id
+  subnet_id       = data.terraform_remote_state.core.outputs.subnet_ids.private_subnet_ids[0]
   security_groups = [aws_security_group.efs.id]
 }
 
 resource "aws_efs_mount_target" "b" {
   file_system_id  = aws_efs_file_system.this.id
-  subnet_id       = module.subnets_b.private_subnet_id
+  subnet_id       = data.terraform_remote_state.core.outputs.subnet_ids.private_subnet_ids[1]
   security_groups = [aws_security_group.efs.id]
 }
