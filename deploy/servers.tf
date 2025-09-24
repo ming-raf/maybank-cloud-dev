@@ -1,5 +1,5 @@
 data "aws_ssm_parameter" "al2023_ami" {
-	name = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64"
+	name = "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-arm64"
 }
 
 resource "aws_security_group" "asg" {
