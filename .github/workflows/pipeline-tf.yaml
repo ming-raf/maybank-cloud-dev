@@ -84,5 +84,6 @@ jobs:
         CLUSTER_STATE_BUCKET="terraform-rafiqi-personal"
         CLUSTER_STATE_REGION="ap-southeast-1"
         CLUSTER_STATE_PROJECT_NAME=maybank-cloud-dev-eks
+        CORE_STATE_PROJECT_NAME=maybank-cloud-dev
     secrets: inherit
     needs: [deploy-eks-tf]

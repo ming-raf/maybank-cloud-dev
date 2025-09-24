@@ -19,7 +19,7 @@ locals {
   name_prefix = "${var.PROJECT_NAME}-${var.ENVIRONMENT_NAME}"
 }
 
-data "terraform_remote_state" "core" {
+data "terraform_remote_state" "cluster" {
 	backend = "s3"
 	config = {
 		bucket = var.CLUSTER_STATE_BUCKET
@@ -28,13 +28,22 @@ data "terraform_remote_state" "core" {
 	}
 }
 
+data "terraform_remote_state" "core" {
+	backend = "s3"
+	config = {
+		bucket = var.CORE_STATE_BUCKET
+		key    = "${var.ENVIRONMENT_NAME}/.terraform/${var.CORE_STATE_PROJECT_NAME}.tfstate"
+		region = var.CORE_STATE_REGION
+	}
+}
+
 provider "helm" {
   kubernetes = {
-		host                   = data.terraform_remote_state.core.outputs.cluster_endpoint
-    cluster_ca_certificate = base64decode(data.terraform_remote_state.core.outputs.cluster_certificate_authority_data)
+		host                   = data.terraform_remote_state.cluster.outputs.cluster_endpoint
+    cluster_ca_certificate = base64decode(data.terraform_remote_state.cluster.outputs.cluster_certificate_authority_data)
     exec = {
       api_version = "client.authentication.k8s.io/v1beta1"
-      args        = ["eks", "get-token", "--cluster-name", data.terraform_remote_state.core.outputs.cluster_name]
+      args        = ["eks", "get-token", "--cluster-name", data.terraform_remote_state.cluster.outputs.cluster_name]
       command     = "aws"
     }
   }
