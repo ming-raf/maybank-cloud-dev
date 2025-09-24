@@ -11,6 +11,10 @@ provider "aws" {
 	region = var.AWS_REGION
 }
 
+locals {
+  cluster_name = "maybank-cloud-${var.ENVIRONMENT_NAME}-eks"
+}
+
 data "terraform_remote_state" "core" {
 	backend = "s3"
 	config = {
@@ -21,7 +25,7 @@ data "terraform_remote_state" "core" {
 }
 
 resource "aws_eks_cluster" "this" {
-  name     = "maybank-eks-cluster"
+  name     = local.cluster_name
   role_arn = aws_iam_role.eks_cluster_role.arn
   version  = "1.33"
 
@@ -39,7 +43,7 @@ resource "aws_eks_cluster" "this" {
 
 resource "aws_eks_node_group" "default" {
   cluster_name    = aws_eks_cluster.this.name
-  node_group_name = "${aws_eks_cluster.this.name}-ng"
+  node_group_name = "${local.cluster_name}-ng"
   node_role_arn   = aws_iam_role.eks_node_role.arn
   subnet_ids      = data.terraform_remote_state.core.outputs.subnet_ids.private_subnet_ids
 
