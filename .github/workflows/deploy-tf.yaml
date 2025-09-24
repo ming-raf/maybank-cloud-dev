@@ -34,6 +34,16 @@ on:
         description: "List of build-time variables"
         type: string
         required: false
+      core-state-bucket:
+        description: "Core state S3 bucket"
+        type: string
+        required: false
+        default: "terraform-rafiqi-personal"
+      core-state-region:
+        description: "Core state region"
+        type: string
+        required: false
+        default: "ap-southeast-1"
 
 jobs:
   terraform-deploy:
@@ -49,8 +59,8 @@ jobs:
       VERSION: ${{ inputs.version }}
       SHA: ${{ github.sha }}
       ACCOUNT_ID: ${{ inputs.accountId }}
-      CORE_STATE_BUCKET: "terraform-rafiqi-personal"
-      CORE_STATE_REGION: "ap-southeast-1"
+      CORE_STATE_BUCKET: ${{ inputs.core-state-bucket }}
+      CORE_STATE_REGION: ${{ inputs.core-state-region }}
     environment: ${{ inputs.environmentName }}
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
