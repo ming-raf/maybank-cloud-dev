@@ -51,6 +51,8 @@ jobs:
       version: ${{ github.sha }}
       destroyTerraform: ${{ inputs.destroyTerraform || false }}
       build-args: |
+        CORE_STATE_BUCKET="terraform-rafiqi-personal"
+        CORE_STATE_REGION="ap-southeast-1"
         CORE_STATE_PROJECT_NAME=maybank-cloud-dev
         ORIGIN_REGION=ap-southeast-1
     secrets: inherit
@@ -66,7 +68,25 @@ jobs:
       version: ${{ github.sha }}
       destroyTerraform: ${{ inputs.destroyTerraform || false }}
       build-args: |
+        CORE_STATE_BUCKET="terraform-rafiqi-personal"
+        CORE_STATE_REGION="ap-southeast-1"
         CORE_STATE_PROJECT_NAME=maybank-cloud-dev
         ORIGIN_REGION=ap-southeast-1
     secrets: inherit
     needs: [deploy-tf]
+
+  deploy-app-tf:
+    uses: ./.github/workflows/deploy-tf.yaml
+    with:
+      accountId: ${{ inputs.accountId || '879381243152' }}
+      environmentName: ${{ inputs.environmentName || 'test' }}
+      projectName: "maybank-cloud-dev-app"
+      deployDirectory: "deploy/modules/app"
+      version: ${{ github.sha }}
+      destroyTerraform: ${{ inputs.destroyTerraform || false }}
+      build-args: |
+        CLUSTER_STATE_BUCKET="terraform-rafiqi-personal"
+        CLUSTER_STATE_REGION="ap-southeast-1"
+        CLUSTER_STATE_PROJECT_NAME=maybank-cloud-dev-eks
+    secrets: inherit
+    needs: [deploy-eks-tf]

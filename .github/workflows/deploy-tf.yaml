@@ -49,8 +49,6 @@ jobs:
       VERSION: ${{ inputs.version }}
       SHA: ${{ github.sha }}
       ACCOUNT_ID: ${{ inputs.accountId }}
-      CORE_STATE_BUCKET: "terraform-rafiqi-personal"
-      CORE_STATE_REGION: "ap-southeast-1"
     environment: ${{ inputs.environmentName }}
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
