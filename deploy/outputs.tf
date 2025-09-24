@@ -66,3 +66,11 @@ output "ssm_vpc_endpoint_ids" {
     ec2messages  = aws_vpc_endpoint.ec2messages.id
   }
 }
+
+output "subnet_ids" {
+  description = "IDs of the public and private subnets"
+  value = {
+    public_subnet_ids  = [module.subnets_a.public_subnet_id, module.subnets_b.public_subnet_id]
+    private_subnet_ids = [module.subnets_a.private_subnet_id, module.subnets_b.private_subnet_id]
+  }
+}
