@@ -58,3 +58,34 @@ resource "aws_iam_role_policy_attachment" "ecr_readonly" {
   role       = aws_iam_role.eks_node_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
+
+# not super secure but its okay for demo purposes
+data "aws_caller_identity" "current" {}
+
+locals {
+  root_user_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+}
+
+resource "aws_eks_access_entry" "root" {
+  cluster_name  = aws_eks_cluster.this.name
+  principal_arn = local.root_user_arn
+  type          = "STANDARD"
+
+  depends_on = [
+    aws_eks_cluster.this
+  ]
+}
+
+resource "aws_eks_access_policy_association" "root_admin" {
+  cluster_name  = aws_eks_cluster.this.name
+  principal_arn = aws_eks_access_entry.root.principal_arn
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+
+  access_scope {
+    type = "cluster"
+  }
+
+  depends_on = [
+    aws_eks_access_entry.root
+  ]
+}

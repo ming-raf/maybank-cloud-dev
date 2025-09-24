@@ -88,34 +88,3 @@ resource "aws_eks_addon" "coredns" {
   cluster_name = aws_eks_cluster.this.name
   addon_name   = "coredns"
 }
-
-# Grant EKS access to IAM user 'fricheps'
-data "aws_caller_identity" "current" {}
-
-locals {
-  fricheps_user_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/fricheps"
-}
-
-resource "aws_eks_access_entry" "fricheps" {
-  cluster_name  = aws_eks_cluster.this.name
-  principal_arn = local.fricheps_user_arn
-  type          = "STANDARD"
-
-  depends_on = [
-    aws_eks_cluster.this
-  ]
-}
-
-resource "aws_eks_access_policy_association" "fricheps_admin" {
-  cluster_name  = aws_eks_cluster.this.name
-  principal_arn = aws_eks_access_entry.fricheps.principal_arn
-  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-
-  access_scope {
-    type = "cluster"
-  }
-
-  depends_on = [
-    aws_eks_access_entry.fricheps
-  ]
-}
