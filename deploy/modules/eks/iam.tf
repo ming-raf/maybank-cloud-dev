@@ -16,7 +16,7 @@ data "aws_iam_policy_document" "eks_cluster_assume" {
 resource "aws_iam_role" "eks_cluster_role" {
   name               = "${local.cluster_name}-cluster-role"
   assume_role_policy = data.aws_iam_policy_document.eks_cluster_assume.json
-}
+  }
 
 resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
   role       = aws_iam_role.eks_cluster_role.name
@@ -25,7 +25,7 @@ resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
 
 resource "aws_iam_role_policy_attachment" "eks_vpc_resource_controller" {
   role       = aws_iam_role.eks_cluster_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_VPCResourceController"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
 }
 
 data "aws_iam_policy_document" "eks_node_assume" {
@@ -42,7 +42,7 @@ data "aws_iam_policy_document" "eks_node_assume" {
 resource "aws_iam_role" "eks_node_role" {
   name               = "${local.cluster_name}-node-role"
   assume_role_policy = data.aws_iam_policy_document.eks_node_assume.json
-}
+  }
 
 resource "aws_iam_role_policy_attachment" "eks_worker_node" {
   role       = aws_iam_role.eks_node_role.name
