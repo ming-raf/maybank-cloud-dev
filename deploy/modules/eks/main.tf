@@ -60,12 +60,6 @@ resource "aws_eks_cluster" "this" {
     security_group_ids = [ aws_security_group.eks.id ]
   }
 
-  storage_config {
-    block_storage {
-      enabled = true
-    }
-  }
-
   depends_on = [
     aws_iam_role_policy_attachment.eks_cluster_policy,
     aws_iam_role_policy_attachment.eks_vpc_resource_controller,
