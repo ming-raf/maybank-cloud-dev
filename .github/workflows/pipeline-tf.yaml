@@ -55,3 +55,18 @@ jobs:
         ORIGIN_REGION=ap-southeast-1
     secrets: inherit
     needs: [deploy-tf]
+
+  deploy-eks-tf:
+    uses: ./.github/workflows/deploy-tf.yaml
+    with:
+      accountId: ${{ inputs.accountId || '879381243152' }}
+      environmentName: ${{ inputs.environmentName || 'test' }}
+      projectName: "maybank-cloud-dev-eks"
+      deployDirectory: "deploy/modules/eks"
+      version: ${{ github.sha }}
+      destroyTerraform: ${{ inputs.destroyTerraform || false }}
+      build-args: |
+        CORE_STATE_PROJECT_NAME=maybank-cloud-dev
+        ORIGIN_REGION=ap-southeast-1
+    secrets: inherit
+    needs: [deploy-tf]
