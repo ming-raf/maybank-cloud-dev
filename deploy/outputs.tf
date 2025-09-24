@@ -47,3 +47,22 @@ output "nlb_zone_id" {
   description = "Hosted zone ID of the Network Load Balancer"
   value       = aws_lb.nlb.zone_id
 }
+
+output "bastion_instance_id" {
+  description = "Instance ID of the SSM bastion"
+  value       = aws_instance.bastion.id
+}
+
+output "bastion_private_ip" {
+  description = "Private IP of the SSM bastion"
+  value       = aws_instance.bastion.private_ip
+}
+
+output "ssm_vpc_endpoint_ids" {
+  description = "IDs of the SSM interface VPC endpoints (ssm, ssmmessages, ec2messages)"
+  value = {
+    ssm          = aws_vpc_endpoint.ssm.id
+    ssmmessages  = aws_vpc_endpoint.ssmmessages.id
+    ec2messages  = aws_vpc_endpoint.ec2messages.id
+  }
+}
