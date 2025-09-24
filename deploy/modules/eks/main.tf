@@ -54,7 +54,7 @@ resource "aws_eks_node_group" "default" {
   }
 
   instance_types = ["t4g.micro"]
-  ami_type       = "AL2_ARM_64"
+  ami_type       = "AL2023_ARM_64_STANDARD "
   capacity_type  = "ON_DEMAND"
 
   update_config {
