@@ -56,17 +56,53 @@ spec:
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- with .Values.volumeMounts }}
-          volumeMounts:
-            {{- toYaml . | nindent 12 }}
+          {{- if .Values.envSecret.enabled }}
+          envFrom:
+            - secretRef:
+                name: {{ include "sample-app.fullname" . }}-env
           {{- end }}
-      {{- with .Values.volumes }}
+          {{- if or .Values.volumeMounts .Values.config.enabled (and .Values.persistence.enabled .Values.persistence.mountPath) }}
+          volumeMounts:
+            {{- if .Values.volumeMounts }}
+            {{- toYaml .Values.volumeMounts | nindent 12 }}
+            {{- end }}
+            {{- if .Values.config.enabled }}
+            - name: config
+              mountPath: {{ .Values.config.mountPath }}
+            {{- end }}
+            {{- if and .Values.persistence.enabled .Values.persistence.mountPath }}
+            - name: data
+              mountPath: {{ .Values.persistence.mountPath }}
+            {{- end }}
+          {{- end }}
+      {{- if or .Values.volumes .Values.config.enabled .Values.persistence.enabled }}
       volumes:
-        {{- toYaml . | nindent 8 }}
+        {{- if .Values.volumes }}
+        {{- toYaml .Values.volumes | nindent 8 }}
+        {{- end }}
+        {{- if .Values.config.enabled }}
+        - name: config
+          configMap:
+            name: {{ include "sample-app.fullname" . }}-config
+        {{- end }}
+        {{- if .Values.persistence.enabled }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ default (include "sample-app.fullname" .) .Values.persistence.existingClaim }}
+        {{- end }}
       {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.topologySpreadConstraints.enabled }}
+      topologySpreadConstraints:
+        - maxSkew: {{ .Values.topologySpreadConstraints.maxSkew | default 1 }}
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: {{ .Values.topologySpreadConstraints.whenUnsatisfiable | default "ScheduleAnyway" }}
+          labelSelector:
+            matchLabels:
+              {{- include "sample-app.selectorLabels" . | nindent 14 }}
       {{- end }}
       {{- with .Values.affinity }}
       affinity:

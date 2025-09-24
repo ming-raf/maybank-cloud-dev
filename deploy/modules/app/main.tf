@@ -38,7 +38,7 @@ provider "helm" {
 
 resource "helm_release" "app" {
 	name       = "sample-app"
-	chart      = "${path.root}/helm/sample-app"
+	chart      = "${path.root}/../helm/sample-app"
 	namespace  = "app"
 	create_namespace = true
 	dependency_update = true

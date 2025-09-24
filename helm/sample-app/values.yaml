@@ -24,6 +24,7 @@ securityContext:
 service:
   type: ClusterIP
   port: 80
+  annotations: {}
 ingress:
   enabled: false
   className: ""
@@ -66,3 +67,40 @@ volumeMounts: []
 nodeSelector: {}
 tolerations: []
 affinity: {}
+
+# Inject Kubernetes Secret as environment variables
+envSecret:
+  enabled: false
+  data: {}
+  # EXAMPLE:
+  #   DB_USER: admin
+  #   DB_PASS: changeme
+
+# Mount a ConfigMap with files into the pod
+config:
+  enabled: false
+  mountPath: /config
+  files: {}
+  # EXAMPLE:
+  #   app.yaml: |
+  #     key: value
+
+# Persistence via PVC (e.g., EFS through a StorageClass)
+persistence:
+  enabled: false
+  existingClaim: ""
+  accessMode: ReadWriteMany
+  size: 5Gi
+  storageClassName: ""  # set to your EFS storage class, e.g., efs-sc
+  mountPath: /data
+
+  # EXAMPLE annotations when service.type=LoadBalancer (AWS NLB):
+  # annotations:
+  #   service.beta.kubernetes.io/aws-load-balancer-type: external
+  #   service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: instance
+
+# Distribute pods across AZs for HA
+topologySpreadConstraints:
+  enabled: false
+  maxSkew: 1
+  whenUnsatisfiable: ScheduleAnyway
