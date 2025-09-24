@@ -24,6 +24,23 @@ data "terraform_remote_state" "core" {
 	}
 }
 
+resource "aws_security_group" "eks" {
+  name        = "${local.cluster_name}-sg"
+  vpc_id     = data.terraform_remote_state.core.outputs.vpc_id
+  egress = [ {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  } ]
+  ingress = [ {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  } ]
+}
+
 resource "aws_eks_cluster" "this" {
   name     = local.cluster_name
   role_arn = aws_iam_role.eks_cluster_role.arn
@@ -38,6 +55,13 @@ resource "aws_eks_cluster" "this" {
     subnet_ids              = data.terraform_remote_state.core.outputs.subnet_ids.private_subnet_ids
     endpoint_public_access  = true
     endpoint_private_access = true
+    security_group_ids = [ aws_security_group.eks.id ]
+  }
+
+  storage_config {
+    block_storage {
+      enabled = true
+    }
   }
 
   depends_on = [
