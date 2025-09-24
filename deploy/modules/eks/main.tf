@@ -29,6 +29,11 @@ resource "aws_eks_cluster" "this" {
   role_arn = aws_iam_role.eks_cluster_role.arn
   version  = "1.33"
 
+  access_config {
+    authentication_mode                         = "API"
+    bootstrap_cluster_creator_admin_permissions = true
+  }
+
   vpc_config {
     subnet_ids              = data.terraform_remote_state.core.outputs.subnet_ids.private_subnet_ids
     endpoint_public_access  = true
