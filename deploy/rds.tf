@@ -101,7 +101,7 @@ resource "aws_db_instance" "mariadb" {
 
 resource "aws_db_instance" "mariadb_replica" {
 	identifier           = "${local.name_prefix}-mariadb-replica-1"
-	replicate_source_db  = aws_db_instance.mariadb.id
+	replicate_source_db  = aws_db_instance.mariadb.arn
 	instance_class       = "db.m5.large"
 	availability_zone    = data.aws_availability_zones.available.names[1]
 	publicly_accessible  = false
