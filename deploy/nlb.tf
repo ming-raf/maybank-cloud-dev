@@ -18,13 +18,13 @@ resource "aws_lb" "nlb" {
   ]
 }
 
-resource "aws_lb_target_group" "nlb_tg" {
-  name        = "${local.name_prefix}-tg"
-  port        = 80
-  protocol    = "TCP"
-  target_type = "instance"
-  vpc_id      = aws_vpc.main.id
-}
+# resource "aws_lb_target_group" "nlb_tg" {
+#   name        = "${local.name_prefix}-tg"
+#   port        = 80
+#   protocol    = "TCP"
+#   target_type = "instance"
+#   vpc_id      = aws_vpc.main.id
+# }
 
 resource "aws_lb_listener" "nlb_https" {
   load_balancer_arn = aws_lb.nlb.arn
