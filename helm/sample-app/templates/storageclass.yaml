@@ -1,0 +1,35 @@
+{{- if .Values.storageClass.enabled }}
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: {{ .Values.storageClass.name | default (printf "%s-%s" (include "sample-app.name" .) "efs-sc") }}
+  labels:
+    {{- include "sample-app.labels" . | nindent 4 }}
+provisioner: efs.csi.aws.com
+parameters:
+  {{- if .Values.storageClass.parameters.fileSystemId }}
+  fileSystemId: {{ .Values.storageClass.parameters.fileSystemId | quote }}
+  {{- end }}
+  {{- if .Values.storageClass.parameters.provisioningMode }}
+  provisioningMode: {{ .Values.storageClass.parameters.provisioningMode | quote }}
+  {{- end }}
+  {{- if .Values.storageClass.parameters.directoryPerms }}
+  directoryPerms: {{ .Values.storageClass.parameters.directoryPerms | quote }}
+  {{- end }}
+  {{- if .Values.storageClass.parameters.gidRangeStart }}
+  gidRangeStart: {{ .Values.storageClass.parameters.gidRangeStart | quote }}
+  {{- end }}
+  {{- if .Values.storageClass.parameters.gidRangeEnd }}
+  gidRangeEnd: {{ .Values.storageClass.parameters.gidRangeEnd | quote }}
+  {{- end }}
+  {{- if .Values.storageClass.parameters.basePath }}
+  basePath: {{ .Values.storageClass.parameters.basePath | quote }}
+  {{- end }}
+mountOptions:
+  {{- range .Values.storageClass.mountOptions }}
+  - {{ . | quote }}
+  {{- end }}
+reclaimPolicy: {{ .Values.storageClass.reclaimPolicy | default "Delete" }}
+volumeBindingMode: {{ .Values.storageClass.volumeBindingMode | default "WaitForFirstConsumer" }}
+allowVolumeExpansion: {{ .Values.storageClass.allowVolumeExpansion | default true }}
+{{- end }}

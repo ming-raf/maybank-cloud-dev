@@ -15,6 +15,10 @@ provider "aws" {
 	region = var.AWS_REGION
 }
 
+locals {
+  name_prefix = "${var.PROJECT_NAME}-${var.ENVIRONMENT_NAME}"
+}
+
 data "terraform_remote_state" "core" {
 	backend = "s3"
 	config = {
@@ -42,4 +46,23 @@ resource "helm_release" "sample_app" {
 	namespace  = "sample_app"
 	create_namespace = true
 	dependency_update = true
+
+	# Override chart values to wire EFS via YAML
+	values = [
+		yamlencode({
+			storageClass = {
+				enabled    = true
+				name       = "efs-sc"
+				parameters = {
+					fileSystemId     = "${aws_efs_file_system.this.id}"
+				}
+			}
+			persistence = {
+				enabled          = true
+				storageClassName = "efs-sc"
+			}
+		})
+	]
+
+  depends_on = [ aws_efs_file_system.this ]
 }

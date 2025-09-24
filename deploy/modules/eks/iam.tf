@@ -114,3 +114,48 @@ resource "aws_eks_access_policy_association" "automation_admin" {
     aws_eks_access_entry.automation
   ]
 }
+
+data "aws_eks_cluster" "this" {
+  name = aws_eks_cluster.this.name
+}
+
+data "tls_certificate" "cluster" {
+  url = data.aws_eks_cluster.this.identity[0].oidc[0].issuer
+}
+
+resource "aws_iam_openid_connect_provider" "eks" {
+  url             = data.aws_eks_cluster.this.identity[0].oidc[0].issuer
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = [data.tls_certificate.cluster.certificates[0].sha1_fingerprint]
+}
+
+data "aws_iam_policy_document" "efs_csi_assume" {
+  statement {
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+    effect  = "Allow"
+    principals {
+      type        = "Federated"
+      identifiers = [aws_iam_openid_connect_provider.eks.arn]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = format("%s:sub", replace(data.aws_eks_cluster.this.identity[0].oidc[0].issuer, "https://", ""))
+      values   = ["system:serviceaccount:kube-system:efs-csi-controller-sa"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = format("%s:aud", replace(data.aws_eks_cluster.this.identity[0].oidc[0].issuer, "https://", ""))
+      values   = ["sts.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "efs_csi_driver" {
+  name               = "${local.cluster_name}-efs-csi-driver"
+  assume_role_policy = data.aws_iam_policy_document.efs_csi_assume.json
+}
+
+resource "aws_iam_role_policy_attachment" "efs_csi_policy" {
+  role       = aws_iam_role.efs_csi_driver.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEFSCSIDriverPolicy"
+}
