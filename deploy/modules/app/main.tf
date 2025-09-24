@@ -36,10 +36,10 @@ provider "helm" {
   }
 }
 
-resource "helm_release" "app" {
+resource "helm_release" "sample_app" {
 	name       = "sample-app"
 	chart      = "../../../helm/sample-app"
-	namespace  = "app"
+	namespace  = "sample_app"
 	create_namespace = true
 	dependency_update = true
 }
