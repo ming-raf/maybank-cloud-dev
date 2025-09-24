@@ -2,7 +2,7 @@ terraform {
 	required_providers {
 		helm = {
 			source  = "hashicorp/helm"
-			version = "~> 2.13"
+			version = "~> 3.0.2"
 		}
 		aws = {
 			source  = "hashicorp/aws"
@@ -15,81 +15,31 @@ provider "aws" {
 	region = var.AWS_REGION
 }
 
-variable "AWS_REGION" {
-	type        = string
-	description = "AWS region"
-}
-
-variable "ENVIRONMENT_NAME" {
-	type        = string
-	description = "Environment name (e.g. dev, test, prod)"
-}
-
-variable "CORE_STATE_BUCKET" {
-	type        = string
-	description = "S3 bucket holding the core stack state"
-	default     = "terraform-rafiqi-personal"
-}
-
-variable "CORE_STATE_REGION" {
-	type        = string
-	description = "Region for the core state bucket"
-	default     = "ap-southeast-1"
-}
-
-variable "CORE_STATE_PROJECT_NAME" {
-	type        = string
-	description = "Project name used in the core stack state key"
-	default     = "maybank-cloud-dev"
-}
-
-variable "chart_name" {
-	type        = string
-	description = "Helm chart release name"
-	default     = "sample-app"
-}
-
-variable "namespace" {
-	type        = string
-	description = "Kubernetes namespace to install into"
-	default     = "sample-app"
-}
-
-variable "values_files" {
-	type        = list(string)
-	description = "Optional list of Helm values files (YAML) to apply"
-	default     = []
-}
-
-locals {
-	cluster_name = "maybank-cloud-${var.ENVIRONMENT_NAME}-eks"
-}
-
-# Discover EKS cluster endpoint and CA from the EKS module (same state file as other resources)
-data "aws_eks_cluster" "this" {
-	name = local.cluster_name
-}
-
-provider "helm" {
-	kubernetes {
-		host                   = data.aws_eks_cluster.this.endpoint
-		cluster_ca_certificate = base64decode(data.aws_eks_cluster.this.certificate_authority[0].data)
-		token                  = data.aws_eks_cluster_auth.this.token
+data "terraform_remote_state" "core" {
+	backend = "s3"
+	config = {
+		bucket = var.CLUSTER_STATE_BUCKET
+		key    = "${var.ENVIRONMENT_NAME}/.terraform/${var.CLUSTER_STATE_PROJECT_NAME}.tfstate"
+		region = var.CLUSTER_STATE_REGION
 	}
 }
 
+provider "helm" {
+  kubernetes = {
+    host                   = data.terraform_remote_state.core.outputs.cluster_name
+    cluster_ca_certificate = base64decode(data.terraform_remote_state.core.outputs.cluster_certificate_authority_data)
+    exec = {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      args        = ["eks", "get-token", "--cluster-name", data.terraform_remote_state.core.outputs.cluster_name]
+      command     = "aws"
+    }
+  }
+}
+
 resource "helm_release" "app" {
-	name       = var.chart_name
-	chart      = "${path.root}/../helm/${var.chart_name}"
-	namespace  = var.namespace
+	name       = "sample-app"
+	chart      = "${path.root}/../helm/sample-app"
+	namespace  = "app"
 	create_namespace = true
 	dependency_update = true
-
-	# Optional list of values files
-	values = var.values_files
-
-	# Ensure cluster exists first
-	depends_on = [
-			data.aws_eks_cluster.this
-	]
 }
