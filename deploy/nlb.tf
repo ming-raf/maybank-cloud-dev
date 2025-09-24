@@ -22,7 +22,7 @@ resource "aws_lb_target_group" "nlb_tg" {
   name        = "${local.name_prefix}-tg"
   port        = 80
   protocol    = "TCP"
-  target_type = "ip"
+  target_type = "instance"
   vpc_id      = aws_vpc.main.id
 }
 
@@ -35,6 +35,11 @@ resource "aws_lb_listener" "nlb_https" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.nlb_tg.arn
   }
+}
+
+resource "aws_autoscaling_attachment" "asg_to_nlb_tg" {
+  autoscaling_group_name = aws_autoscaling_group.app.name
+  lb_target_group_arn    = aws_lb_target_group.nlb_tg.arn
 }
 
 resource "aws_route53_record" "nlb_alias" {

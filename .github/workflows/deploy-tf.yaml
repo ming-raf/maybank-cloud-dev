@@ -121,6 +121,7 @@ jobs:
             bucket = "${{ env.CORE_STATE_BUCKET }}"
             key    = "${{ inputs.environmentName }}/.terraform/${{ inputs.projectName }}.tfstate"
             region = "${{ env.CORE_STATE_REGION }}"
+            use_lockfile = true
           }
         }
         EOF
