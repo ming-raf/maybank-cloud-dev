@@ -51,8 +51,6 @@ jobs:
       version: ${{ github.sha }}
       destroyTerraform: ${{ inputs.destroyTerraform || false }}
       build-args: |
-        CORE_STATE_BUCKET="terraform-rafiqi-personal"
-        CORE_STATE_REGION="ap-southeast-1"
         CORE_STATE_PROJECT_NAME=maybank-cloud-dev
         ORIGIN_REGION=ap-southeast-1
     secrets: inherit
@@ -68,8 +66,6 @@ jobs:
       version: ${{ github.sha }}
       destroyTerraform: ${{ inputs.destroyTerraform || false }}
       build-args: |
-        CORE_STATE_BUCKET="terraform-rafiqi-personal"
-        CORE_STATE_REGION="ap-southeast-1"
         CORE_STATE_PROJECT_NAME=maybank-cloud-dev
         ORIGIN_REGION=ap-southeast-1
     secrets: inherit
