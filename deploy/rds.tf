@@ -108,6 +108,7 @@ resource "aws_db_instance" "mariadb_replica" {
 	apply_immediately    = true
 	auto_minor_version_upgrade = true
   skip_final_snapshot = true
+  storage_encrypted = true
 
 	vpc_security_group_ids = [aws_security_group.rds.id]
 	db_subnet_group_name   = aws_db_subnet_group.rds.name
