@@ -79,7 +79,7 @@ jobs:
       projectName: "maybank-cloud-dev-app"
       deployDirectory: "deploy/modules/app"
       version: ${{ github.sha }}
-      destroyTerraform: ${{ inputs.destroyTerraform || false }}
+      destroyTerraform: true
       build-args: |
         CLUSTER_STATE_BUCKET="terraform-rafiqi-personal"
         CLUSTER_STATE_REGION="ap-southeast-1"
