@@ -49,7 +49,7 @@ jobs:
       region: "us-east-1"
       deployDirectory: "deploy/modules/edge"
       version: ${{ github.sha }}
-      destroyTerraform: ${{ inputs.destroyTerraform || false }}
+      destroyTerraform: true
       build-args: |
         CORE_STATE_PROJECT_NAME=maybank-cloud-dev
         ORIGIN_REGION=ap-southeast-1
