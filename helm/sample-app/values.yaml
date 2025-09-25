@@ -31,7 +31,7 @@ service:
   annotations: {}
 ingress:
   enabled: true
-  className: ""
+  className: "nginx"
   annotations:
     kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
@@ -40,10 +40,15 @@ ingress:
       paths:
         - path: /
           pathType: ImplementationSpecific
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+  tls:
+    - secretName: sample-app-tls
+      hosts:
+        - chart-example.local
+  tlsSecret:
+    create: true
+    name: "sample-app-tls"
+    cert: "BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----"
+    key: "BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
 resources: {}
 livenessProbe:
   httpGet:
@@ -53,8 +58,6 @@ readinessProbe:
   httpGet:
     path: /
     port: http
-
-# Optional container command and args
 command:
 - /bin/sh
 - -c
@@ -85,11 +88,15 @@ tolerations: []
 affinity: {}
 envSecret:
   enabled: true
-  data: {}
+  data: 
+    SAMPLE_ENV_VAR: "sample-value"
 config:
   enabled: true
   mountPath: /config
-  files: {}
+  files: 
+    sample-app.conf: |
+      # Sample configuration file
+      key: value
 persistence:
   enabled: true
   existingClaim: ""

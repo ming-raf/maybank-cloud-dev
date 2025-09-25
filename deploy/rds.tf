@@ -13,7 +13,6 @@ resource "aws_security_group" "rds" {
 		from_port   = 3306
 		to_port     = 3306
 		protocol    = "tcp"
-    # Only allow private subnets connectivity
 		cidr_blocks = [local.subnets.subnet_a.private_cidr, local.subnets.subnet_b.private_cidr]
 	}
 
