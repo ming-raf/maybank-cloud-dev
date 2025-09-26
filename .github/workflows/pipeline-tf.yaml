@@ -37,7 +37,7 @@ jobs:
       environmentName: ${{ inputs.environmentName || 'test' }}
       projectName: "maybank-cloud-dev"
       version: ${{ github.sha }}
-      destroyTerraform: ${{ inputs.destroyTerraform || false }}
+      destroyTerraform: true
     secrets: inherit
 
   deploy-edge-tf:
